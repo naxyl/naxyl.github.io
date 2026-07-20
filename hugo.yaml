@@ -13,6 +13,7 @@ params:
     mode: dark
   avatar: "img/avatar.jpg"
   tagline: "Reverse engineering enthusiast"
+  author: "naxyl"
   social:
     links:
       - icon: "fab fa-github"
