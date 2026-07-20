@@ -36,8 +36,11 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Install Dart Sass      # <-- AJOUT DE CETTE ÉTAPE ICI
-        run: npm install -g sass
+      - name: Install Dart Sass (Native Binary)
+        run: |
+          curl -L https://github.com/sass/dart-sass/releases/download/1.77.8/dart-sass-1.77.8-linux-x64.tar.gz -o dart-sass.tar.gz
+          tar -xzf dart-sass.tar.gz
+          echo "${PWD}/dart-sass" >> $GITHUB_PATH
 
       - name: Build
         run: hugo --gc --minify
