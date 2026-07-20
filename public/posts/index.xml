@@ -1,13 +1,13 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>naxyl – Writeups</title>
-    <link>http://localhost:1313/writeups/</link>
-    <description>Recent content in Writeups on naxyl</description>
+    <title>naxyl – Posts</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on naxyl</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 20 Jul 2026 10:35:08 +0200</lastBuildDate>
     
-	  <atom:link href="http://localhost:1313/writeups/index.xml" rel="self" type="application/rss+xml" />
+	  <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
     
     
       
@@ -16,11 +16,11 @@
     
     
     <item>
-      <title>OWASP MASTG - Android</title>
-      <link>http://localhost:1313/writeups/uncrackable-1/</link>
+      <title>Uncrackable 1</title>
+      <link>http://localhost:1313/posts/uncrackable-1/</link>
       <pubDate>Mon, 20 Jul 2026 10:35:08 +0200</pubDate>
       
-      <guid>http://localhost:1313/writeups/uncrackable-1/</guid>
+      <guid>http://localhost:1313/posts/uncrackable-1/</guid>
       <description>
         
         
@@ -70,11 +70,11 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;While launching the app, we see it detects right away the device is rooted.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/detected.png&#34; alt=&#34;alt text&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../img/detected.png&#34; alt=&#34;alt text&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
 &lt;h2&gt;Static reverse with JADX&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;static-reverse-with-jadx&#34;&gt;&lt;/span&gt;
     &lt;a href=&#34;#static-reverse-with-jadx&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Let&amp;rsquo;s inspect the source code in order to understand &lt;strong&gt;how the root detection is made&lt;/strong&gt; so we&amp;rsquo;ll be able to understand how to bypass it.&lt;/p&gt;
 &lt;p&gt;By looking at the &lt;code&gt;onCreate&lt;/code&gt; function (&lt;em&gt;the start of the app lifecycle&lt;/em&gt;) we can see that &lt;strong&gt;four verifications&lt;/strong&gt; are made before letting the user access the app.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/oncreate.png&#34; alt=&#34;alt text&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../img/oncreate.png&#34; alt=&#34;alt text&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Now, we can look for the &amp;ldquo;&lt;code&gt;c&lt;/code&gt;&amp;rdquo; class to see the &lt;strong&gt;Anti-Root&lt;/strong&gt; protections. Here is the commented version :&lt;/p&gt;
 &lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
 
@@ -378,7 +378,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;Looking at our device, we can see &lt;strong&gt;the anti root warning disappeared&lt;/strong&gt; and that we can nowenter the string we want in the input field.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/bypassed.png&#34; alt=&#34;alt text&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../img/bypassed.png&#34; alt=&#34;alt text&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
 &lt;h2&gt;Finding the secret&lt;span class=&#34;hx:absolute hx:-mt-20&#34; id=&#34;finding-the-secret&#34;&gt;&lt;/span&gt;
     &lt;a href=&#34;#finding-the-secret&#34; class=&#34;subheading-anchor&#34; aria-label=&#34;Permalink for this section&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Now that we can do whatever we want on the app as we bypassed the anti-root and anti-debug protections, let&amp;rsquo;s find the string to validate this crackme.&lt;/p&gt;
 &lt;p&gt;This function is called whenever the user clicks on the &amp;ldquo;Verify&amp;rdquo; button.&lt;/p&gt;
@@ -493,7 +493,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;p&gt;By relaunching the script injection and submitting a random input, we indeed get the computed secret !&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:1313/img/flag.png&#34; alt=&#34;alt text&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../img/flag.png&#34; alt=&#34;alt text&#34;  loading=&#34;lazy&#34; /&gt;&lt;/p&gt;
 &lt;div class=&#34;hextra-code-block hx:relative hx:mt-6 hx:first:mt-0 hx:group/code&#34;&gt;
 
 &lt;div&gt;&lt;pre&gt;&lt;code&gt;I want to believe
