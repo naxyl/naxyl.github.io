@@ -52,3 +52,7 @@ markup:
   goldmark:
     renderer:
       unsafe: true
+  highlight:
+    noClasses: false       
+    lineNos: true           
+    lineNumbersInTable: true

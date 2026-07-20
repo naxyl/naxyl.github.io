@@ -5,11 +5,13 @@ draft: false
 categories: [Reverse Engineering, Android]
 tags: [Frida, Hooking, Crackme]
 image:
-  path: img/owasp_mas_header.png
+  path: img/owasp_mas.jpg
   hide: true
 ---
 
-
+<style>
+  .preview-img { display: none !important; }
+</style>
 
 
 # Android Uncrackable L1
@@ -431,6 +433,7 @@ By relaunching the script injection with frida and submitting a random input, we
 
 ![alt text](img/flag.png)  
 
-```
+```sh
 I want to believe
-```⏎     
+```
+
