@@ -26,3 +26,8 @@ params:
     default: dark
   page:
     width: normal
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
