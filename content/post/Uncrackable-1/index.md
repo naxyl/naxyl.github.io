@@ -4,9 +4,13 @@ date: '2026-07-20T10:35:08+02:00'
 draft: false
 categories: [Reverse Engineering, Android]
 tags: [Frida, Hooking, Crackme]
+image:
+  path: img/owasp_mas_header.png
+  hide: true
 ---
 
-![Header OWASP](/img/owasp_mas_header.png)
+
+
 
 # Android Uncrackable L1
 
@@ -45,7 +49,7 @@ Success
 
 While launching the app, we see it detects right away the device is rooted. 
 
-![alt text](/img/detected.png)  
+![alt text](img/detected.png)  
 
 
 
@@ -55,7 +59,7 @@ Let's inspect the source code in order to understand **how the root detection is
 
 By looking at the `onCreate` function (*the start of the app lifecycle*) we can see that **four verifications** are made before letting the user access the app. 
 
-![alt text](/img/oncreate.png)
+![alt text](img/oncreate.png)
 
 Now, we can look for the "`c`" class to see the **anti-root** protections. Here is the commented version :
 ```java
@@ -313,7 +317,7 @@ Spawned `owasp.mstg.uncrackable1`. Resuming main thread!
 
 Looking at our device, we can see **the anti root warning disappeared** and that we can now enter the string we want in the input field. Let's try a random string to see what message we now get. 
 
-![alt text](/img/bypassed.png)
+![alt text](img/bypassed.png)
 
 > [!IMPORTANT]
 > We bypassed the anti-root protections. The anti-debug protection (application flags) was not triggered as we did not modify the APK, so no need to add a hook for it into our exploitation script. 
@@ -425,7 +429,7 @@ aClass.a.implementation = function(arg1: any, arg2: any) {
 
 By relaunching the script injection with frida and submitting a random input, we indeed get the computed secret !
 
-![alt text](/img/flag.png)  
+![alt text](img/flag.png)  
 
 ```
 I want to believe

@@ -315,6 +315,24 @@ $ file UnCrackable-Level1.apk UnCrackable-Level1.apk: Android package (APK), wit
         </a>
       
     
+      
+      
+
+      
+        
+      
+
+      
+        <a
+          href="mailto:naxylre@protonmail.com"
+          aria-label=""
+          target="_blank" rel="noopener noreferrer"
+          
+        >
+          <i class="fas fa-envelope"></i>
+        </a>
+      
+    
       <a href="https://www.root-me.org/_ethereal" target="_blank" rel="noopener noreferrer" aria-label="Root-Me">
       <img src="/img/logo_rm.png" alt="Root-Me" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; transform: translateY(-1px);">
     </a>
@@ -423,6 +441,18 @@ $ file UnCrackable-Level1.apk UnCrackable-Level1.apk: Android package (APK), wit
         
 
         
+          
+          
+          
+          
+          
+
+          
+          
+
+          <div class="mt-3 mb-3">
+            <img src="/post/uncrackable-1/img/owasp_mas_header.png" class="preview-img" alt="Preview Image" w="1200" h="630" ></div>
+        
 
         <div class="d-flex justify-content-between">
           
@@ -473,7 +503,7 @@ $ file UnCrackable-Level1.apk UnCrackable-Level1.apk: Android package (APK), wit
   class="readtime"
   data-bs-toggle="tooltip"
   data-bs-placement="bottom"
-  title="4075 words"
+  title="4066 words"
 >
   <em>22 min</em> read</span>
 
@@ -490,9 +520,6 @@ $ file UnCrackable-Level1.apk UnCrackable-Level1.apk: Android package (APK), wit
 
 
 
-<p><a href="/img/owasp_mas_header.png" class="popup img-link ">
-  <img src="/img/owasp_mas_header.png" alt="Header OWASP">
-</a></p>
 <h1 id="android-uncrackable-l1" id=android-uncrackable-l1>
   Android Uncrackable L1
 </h1><p><u>Statement</u> : A secret string is hidden somewhere in this app. Find a way to extract it.</p>
@@ -537,8 +564,8 @@ An APK Signing Block is a dedicated section within an APK. It stores the <strong
 </span></span><span style="display:flex;"><span>Success</span></span></code></pre></div>
 </div>
 <p>While launching the app, we see it detects right away the device is rooted.</p>
-<p><a href="/img/detected.png" class="popup img-link ">
-  <img src="/img/detected.png" alt="alt text">
+<p><a href="/post/uncrackable-1/img/detected.png" class="popup img-link ">
+  <img src="/post/uncrackable-1/img/detected.png" alt="alt text">
 </a></p>
 <h2 id="ii-static-reverse-with-jadx" id=ii-static-reverse-with-jadx>
   
@@ -547,8 +574,8 @@ An APK Signing Block is a dedicated section within an APK. It stores the <strong
   
 </h2><p>Let&rsquo;s inspect the source code in order to understand <strong>how the root detection is made</strong> so we&rsquo;ll be able to understand how to bypass it.</p>
 <p>By looking at the <code>onCreate</code> function (<em>the start of the app lifecycle</em>) we can see that <strong>four verifications</strong> are made before letting the user access the app.</p>
-<p><a href="/img/oncreate.png" class="popup img-link ">
-  <img src="/img/oncreate.png" alt="alt text">
+<p><a href="/post/uncrackable-1/img/oncreate.png" class="popup img-link ">
+  <img src="/post/uncrackable-1/img/oncreate.png" alt="alt text">
 </a></p>
 <p>Now, we can look for the &ldquo;<code>c</code>&rdquo; class to see the <strong>anti-root</strong> protections. Here is the commented version :</p>
 <div class="code-block">
@@ -840,8 +867,8 @@ We can keep a separate terminal open and run <code>npm run watch</code>. This wi
 </span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>Pixel 3::owasp.mstg.uncrackable1 <span style="color:#f92672">]</span>-&gt;</span></span></code></pre></div>
 </div>
 <p>Looking at our device, we can see <strong>the anti root warning disappeared</strong> and that we can now enter the string we want in the input field. Let&rsquo;s try a random string to see what message we now get.</p>
-<p><a href="/img/bypassed.png" class="popup img-link ">
-  <img src="/img/bypassed.png" alt="alt text">
+<p><a href="/post/uncrackable-1/img/bypassed.png" class="popup img-link ">
+  <img src="/post/uncrackable-1/img/bypassed.png" alt="alt text">
 </a></p>
 <blockquote>
 <p>[!IMPORTANT]
@@ -960,8 +987,8 @@ We bypassed the anti-root protections. The anti-debug protection (application fl
 </span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
 </div>
 <p>By relaunching the script injection with frida and submitting a random input, we indeed get the computed secret !</p>
-<p><a href="/img/flag.png" class="popup img-link ">
-  <img src="/img/flag.png" alt="alt text">
+<p><a href="/post/uncrackable-1/img/flag.png" class="popup img-link ">
+  <img src="/post/uncrackable-1/img/flag.png" alt="alt text">
 </a></p>
 <div class="code-block">
   <div class="code-header"> <span data-label-text=""><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>

@@ -18,6 +18,8 @@ params:
     links:
       - icon: "fab fa-github"
         url: "https://github.com/naxyl"
+      - icon: "fas fa-envelope"
+        url: "mailto:naxylre@protonmail.com"
 menu:
   main:
     - identifier: home
