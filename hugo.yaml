@@ -11,12 +11,16 @@ menu:
     - name: Writeups
       pageRef: /writeups
       weight: 1
+    - identifier: reverse     
+      name: Reverse Engineering 
+      url: /reverse/ 
+      weight: 2
     - name: Docs
       pageRef: /docs
-      weight: 2
+      weight: 3
     - name: About
       pageRef: /about
-      weight: 3
+      weight: 4
 
 params:
   navbar:

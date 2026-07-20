@@ -1,11 +1,13 @@
 ---
 date: '2026-07-20T10:35:08+02:00'
 draft: false
-title: 'OWASP MASTG - Android'
+title: 'OWASP MAS - I'
 ---
 # Android Uncrackable L1
 
 <u>Statement</u> : A secret string is hidden somewhere in this app. Find a way to extract it.
+
+This crackme is from the [OWASP MAS crackmes]( https://mas.owasp.org/crackmes/).
 
 ## Resources
 Here are the resources I found useful during the reverse engineering and exploitation processes. 
@@ -339,7 +341,7 @@ public void verify(View view) {
 }
 ```
 
-This is the interisting part. It takes the user input - the "`string`" variable - and calls the `sg.vantagepoint.uncrackable1.a.a(String str)` function.
+This is the interesting part. It takes the user input - the "`string`" variable - and calls the `sg.vantagepoint.uncrackable1.a.a(String str)` function.
 ```java
 if (a.a(string)) {
     alertDialogCreate.setTitle("Success!");
@@ -349,16 +351,26 @@ if (a.a(string)) {
 
 Going into the "`a`" class of the `sg.vantagepoint.uncrackable1` package, we find this code for the "`a`" method : 
 ```java
-public static boolean a(String str) {
-    byte[] bArrA;
-    byte[] bArr = new byte[0];
-    try {
-        bArrA = sg.vantagepoint.a.a.a(b("8d127684cbc37c17616d806cf50473cc"), Base64.decode("5UJiFctbmgbDoLXmpL12mkno8HT4Lv8dlat8FxR2GOc=", 0)); // calls a function doing cryptographic computing. 
-    } catch (Exception e) {
-        Log.d("CodeCheck", "AES error:" + e.getMessage());
-        bArrA = bArr;
+package sg.vantagepoint.uncrackable1;
+
+import android.util.Base64;
+import android.util.Log;
+
+/* JADX INFO: loaded from: classes.dex */
+public class a {
+    public static boolean a(String str) {
+        byte[] bArrA;
+        byte[] bArr = new byte[0];
+        try {
+            bArrA = sg.vantagepoint.a.a.a(b("8d127684cbc37c17616d806cf50473cc"), Base64.decode("5UJiFctbmgbDoLXmpL12mkno8HT4Lv8dlat8FxR2GOc=", 0));
+        } catch (Exception e) {
+            Log.d("CodeCheck", "AES error:" + e.getMessage());
+            bArrA = bArr;
+        }
+        return str.equals(new String(bArrA));
     }
-    return str.equals(new String(bArrA));
+    
+    ...
 }
 ```
 Instead of wasting time trying to understand the crypto operations, let's hook the `sg.vantagepoint.a.a.a` function so it directly prints the value it computes (the expected value for our input).
