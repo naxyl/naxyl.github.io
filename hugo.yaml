@@ -1,35 +1,49 @@
 baseURL: "https://naxyl.re/"
-languageCode: "en-us"
+locale: "en"
 title: "naxyl"
+
 
 module:
   imports:
-    - path: github.com/imfing/hextra
-
-menu:
-  main:
-    - name: Writeups
-      pageRef: /writeups
-      weight: 1
-    - identifier: reverse     
-      name: Reverse Engineering 
-      url: /reverse/ 
-      weight: 2
-    - name: Docs
-      pageRef: /docs
-      weight: 3
-    - name: About
-      pageRef: /about
-      weight: 4
+    - path: github.com/geekifan/hugo-theme-chirpy
 
 params:
-  navbar:
-    displayTitle: true
-    displayLogo: false
+  mainSections: ["post"]
   theme:
-    default: dark
-  page:
-    width: normal
+    mode: dark
+  avatar: "img/avatar.jpg"
+  tagline: "Reverse engineering enthusiast"
+  social:
+    links:
+      - icon: "fab fa-github"
+        url: "https://github.com/naxyl"
+menu:
+  main:
+    - identifier: home
+      name: Home
+      url: /
+      weight: 10
+      pre: fa-house
+    - identifier: categories
+      name: Categories
+      url: /categories/
+      weight: 20
+      pre: fa-folder-open
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 30
+      pre: fa-tags
+    - identifier: archives
+      name: Archives
+      url: /archives/
+      weight: 40
+      pre: fa-archive
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 50
+      pre: fa-info-circle
 
 markup:
   goldmark:

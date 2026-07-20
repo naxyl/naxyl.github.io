@@ -2,6 +2,10 @@
 title: "About"
 ---
 
+# About
+
+<br>
+
 Hi, I'm **naxyl**. 
 I'm a cybersecurity engineering student and a CTF player. I spend most of my time specializing in reverse engineering, analyzing mobile applications, and tearing down binaries.
 

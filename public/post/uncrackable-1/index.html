@@ -1,0 +1,1546 @@
+<!doctype html>
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  
+  
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/main.min.d49b6ef35edf721d4dc6cec013af56048683c087a5d8bfcf71c47e72626b06dd.css">
+</head>
+<html lang="en">
+  
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f7">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta
+    name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"
+  >
+
+  <meta property="og:url" content="http://localhost:1313/post/uncrackable-1/">
+	<meta property="og:site_name" content="naxyl">
+	<meta property="og:title" content="OWASP MAS - I">
+	<meta property="og:description" content="Android Uncrackable L1 Statement : A secret string is hidden somewhere in this app. Find a way to extract it.
+This crackme is from the OWASP MAS crackmes.
+Resources Here are the resources I found useful during the reverse engineering and exploitation processes.
+https://medium.com/@ahmedafatah/android-security-for-dummies-root-detection-695bd4d90db8 https://droidwin.com/how-to-hide-su-file-and-magisk-file/ https://stackoverflow.com/questions/18808705/android-root-detection-using-build-tags https://developer.android.com/reference/android/content/pm/ApplicationInfo#flags https://frida.re/docs/android/ https://frida.re/docs/javascript-api I. First analysis We get this APK file :
+$ file UnCrackable-Level1.apk UnCrackable-Level1.apk: Android package (APK), with AndroidManifest.xml, with APK Signing Block So there’s obviously the AndroidManifest.xml file containing the app metadata. The file command also shows the presence of the APK Signing Block.">
+	<meta property="og:locale" content="en">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="post">
+		<meta property="article:published_time" content="2026-07-20T10:35:08+02:00">
+		<meta property="article:modified_time" content="2026-07-20T10:35:08+02:00">
+		<meta property="article:tag" content="Frida">
+		<meta property="article:tag" content="Hooking">
+		<meta property="article:tag" content="Crackme">
+
+  
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="OWASP MAS - I">
+	<meta name="twitter:description" content="Android Uncrackable L1 Statement : A secret string is hidden somewhere in this app. Find a way to extract it.
+This crackme is from the OWASP MAS crackmes.
+Resources Here are the resources I found useful during the reverse engineering and exploitation processes.
+https://medium.com/@ahmedafatah/android-security-for-dummies-root-detection-695bd4d90db8 https://droidwin.com/how-to-hide-su-file-and-magisk-file/ https://stackoverflow.com/questions/18808705/android-root-detection-using-build-tags https://developer.android.com/reference/android/content/pm/ApplicationInfo#flags https://frida.re/docs/android/ https://frida.re/docs/javascript-api I. First analysis We get this APK file :
+$ file UnCrackable-Level1.apk UnCrackable-Level1.apk: Android package (APK), with AndroidManifest.xml, with APK Signing Block So there’s obviously the AndroidManifest.xml file containing the app metadata. The file command also shows the presence of the APK Signing Block.">
+
+  
+	<meta itemprop="name" content="OWASP MAS - I">
+	<meta itemprop="description" content="Android Uncrackable L1 Statement : A secret string is hidden somewhere in this app. Find a way to extract it.
+This crackme is from the OWASP MAS crackmes.
+Resources Here are the resources I found useful during the reverse engineering and exploitation processes.
+https://medium.com/@ahmedafatah/android-security-for-dummies-root-detection-695bd4d90db8 https://droidwin.com/how-to-hide-su-file-and-magisk-file/ https://stackoverflow.com/questions/18808705/android-root-detection-using-build-tags https://developer.android.com/reference/android/content/pm/ApplicationInfo#flags https://frida.re/docs/android/ https://frida.re/docs/javascript-api I. First analysis We get this APK file :
+$ file UnCrackable-Level1.apk UnCrackable-Level1.apk: Android package (APK), with AndroidManifest.xml, with APK Signing Block So there’s obviously the AndroidManifest.xml file containing the app metadata. The file command also shows the presence of the APK Signing Block.">
+	<meta itemprop="datePublished" content="2026-07-20T10:35:08+02:00">
+	<meta itemprop="dateModified" content="2026-07-20T10:35:08+02:00">
+	<meta itemprop="wordCount" content="2192">
+	<meta itemprop="keywords" content="Frida,Hooking,Crackme">
+
+  <title>
+    
+      OWASP MAS - I | 
+    
+    naxyl
+  </title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicons/favicon-16x16.png">
+
+<link rel="shortcut icon" href="/img/favicons/favicon.ico">
+<meta name="apple-mobile-web-app-title" content="naxyl">
+<meta name="application-name" content="naxyl">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="msapplication-config" content="/img/favicons/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+
+  
+  
+    
+      
+      
+        <link rel="preconnect" href="https://fonts.googleapis.com" >
+      
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" >
+      
+    
+      
+      
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" >
+      
+    
+      
+      
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" >
+      
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" >
+      
+    
+  
+
+  
+  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="http://localhost:1313/css/main.min.d49b6ef35edf721d4dc6cec013af56048683c087a5d8bfcf71c47e72626b06dd.css">
+
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&amp;family=Source&#43;Sans&#43;Pro:wght@400;600;700;900&amp;display=swap">
+
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.1/css/all.min.css">
+
+  
+  
+
+  
+    <link rel="stylesheet" href="/">
+  
+
+  
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css">
+  
+
+  
+  <script src="/js/modules/theme.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    
+    
+      
+    
+    
+      
+    
+  
+
+
+
+  
+  
+  
+    
+  
+  
+    
+  
+  
+    
+  
+  
+    
+  
+
+
+
+  
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.13/locale/en.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.13/plugin/relativeTime.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.13/plugin/localizedFormat.js"></script>
+
+
+
+
+  
+<script defer src="/js/post.js"></script>
+
+
+
+
+
+  
+  
+
+
+  
+
+  
+
+</head>
+  <body>
+    
+<aside aria-label="Sidebar" id="sidebar" class="d-flex flex-column align-items-end">
+  <header class="profile-wrapper">
+    <a href="/" id="avatar" class="rounded-circle"><img src="http://localhost:1313/img/avatar.jpg" width="112" height="112" alt="avatar" onerror="this.style.display='none'"></a>
+
+    <a class="site-title d-block" href="/">naxyl</a>
+    
+      <p class="site-subtitle fst-italic mb-0">Reverse engineering enthusiast</p>
+    
+  </header>
+  
+
+  <nav class="flex-column flex-grow-1 w-100 ps-0">
+    <ul class="nav">
+      
+        
+        
+        <li class="nav-item">
+          <a href="/" class="nav-link">
+            <i class="fa-fw fas fa-house"></i>
+            <span>HOME</span>
+          </a>
+        </li>
+        
+      
+        
+        
+        <li class="nav-item">
+          <a href="/categories/" class="nav-link">
+            <i class="fa-fw fas fa-folder-open"></i>
+            <span>CATEGORIES</span>
+          </a>
+        </li>
+        
+      
+        
+        
+        <li class="nav-item">
+          <a href="/tags/" class="nav-link">
+            <i class="fa-fw fas fa-tags"></i>
+            <span>TAGS</span>
+          </a>
+        </li>
+        
+      
+        
+        
+        <li class="nav-item">
+          <a href="/archives/" class="nav-link">
+            <i class="fa-fw fas fa-archive"></i>
+            <span>ARCHIVES</span>
+          </a>
+        </li>
+        
+      
+        
+        
+        <li class="nav-item">
+          <a href="/about/" class="nav-link">
+            <i class="fa-fw fas fa-info-circle"></i>
+            <span>ABOUT</span>
+          </a>
+        </li>
+        
+      
+
+      
+    </ul>
+  </nav>
+
+  <div class="sidebar-bottom d-flex flex-wrap align-items-center w-100">
+    
+      <button type="button" class="btn btn-link nav-link" aria-label="Switch Mode" id="mode-toggle">
+        <i class="fas fa-adjust"></i>
+      </button>
+
+      
+        <span class="icon-border"></span>
+      
+    
+
+    
+      
+      
+
+      
+        
+      
+
+      
+        <a
+          href="https://github.com/naxyl"
+          aria-label=""
+          target="_blank" rel="noopener noreferrer"
+          
+        >
+          <i class="fab fa-github"></i>
+        </a>
+      
+    
+      <a href="https://www.root-me.org/_ethereal" target="_blank" rel="noopener noreferrer" aria-label="Root-Me">
+      <img src="/img/logo_rm.png" alt="Root-Me" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; transform: translateY(-1px);">
+    </a>
+  </div>
+  
+</aside>
+
+    <div id="main-wrapper" class="d-flex justify-content-center">
+      <div class="container d-flex flex-column px-xxl-5">
+        
+<header id="topbar-wrapper" class="flex-shrink-0" aria-label="Top Bar">
+  <div id="topbar" class="d-flex align-items-center justify-content-between px-lg-3 h-100">
+    <nav id="breadcrumb" aria-label="Breadcrumb">
+      
+      
+      
+      
+
+      
+        <span>
+          <a href="/">Home</a>
+        </span>
+        
+        
+          
+          
+            
+          
+            
+          
+            
+          
+            
+          
+            
+          
+
+          
+          
+            <span>OWASP MAS - I</span>  
+          
+
+
+        
+      
+    </nav>
+    
+
+    <button type="button" id="sidebar-trigger" class="btn btn-link" aria-label="Sidebar">
+      <i class="fas fa-bars fa-fw"></i>
+    </button>
+
+    <div id="topbar-title">
+      OWASP MAS - I
+    </div>
+
+    <button type="button" id="search-trigger" class="btn btn-link" aria-label="Search">
+      <i class="fas fa-search fa-fw"></i>
+    </button>
+
+    <search id="search" class="align-items-center ms-3 ms-lg-0">
+      <i class="fas fa-search fa-fw"></i>
+      <input
+        class="form-control"
+        id="search-input"
+        type="search"
+        aria-label="search"
+        autocomplete="off"
+        placeholder="Search..."
+      >
+    </search>
+    <button type="button" class="btn btn-link text-decoration-none" id="search-cancel">Cancel</button>
+  </div>
+</header>
+        <div class="row flex-grow-1">
+          <main aria-label="Main Content" class="col-12 col-lg-11 col-xl-9 px-md-4">
+            
+  
+  
+  
+
+  <article class="px-1" data-toc="">
+    <header>
+      <h1 data-toc-skip>OWASP MAS - I</h1>
+      
+
+      <div class="post-meta text-muted">
+        
+        <span>
+          Posted
+          
+
+
+
+<time
+  
+  data-ts="1784536508"
+  data-df="ll"
+  data-bs-toggle="tooltip" data-bs-placement="bottom"
+>
+  %b %e, %Y
+</time>
+        </span>
+
+        
+        
+
+        
+
+        <div class="d-flex justify-content-between">
+          
+          <span>
+            
+            
+              
+            
+            
+
+
+            By
+
+            <em>
+              
+                
+                  
+                    
+                  
+                  
+                
+              
+            </em>
+          </span>
+
+          <div>
+            
+            
+
+            
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span
+  class="readtime"
+  data-bs-toggle="tooltip"
+  data-bs-placement="bottom"
+  title="4075 words"
+>
+  <em>22 min</em> read</span>
+
+          </div>
+        </div>
+      </div>
+    </header>
+
+    
+
+    <div class="content">
+      
+
+
+
+
+<p><a href="/img/owasp_mas_header.png" class="popup img-link ">
+  <img src="/img/owasp_mas_header.png" alt="Header OWASP">
+</a></p>
+<h1 id="android-uncrackable-l1" id=android-uncrackable-l1>
+  Android Uncrackable L1
+</h1><p><u>Statement</u> : A secret string is hidden somewhere in this app. Find a way to extract it.</p>
+<p>This crackme is from the <a href="https://mas.owasp.org/crackmes/">OWASP MAS crackmes</a>.</p>
+<h2 id="resources" id=resources>
+  
+    <span class="me-2">Resources</span>
+    <a href="#resources" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h2><p>Here are the resources I found useful during the reverse engineering and exploitation processes.</p>
+<ul>
+<li><a href="https://medium.com/@ahmedafatah/android-security-for-dummies-root-detection-695bd4d90db8">https://medium.com/@ahmedafatah/android-security-for-dummies-root-detection-695bd4d90db8</a></li>
+<li><a href="https://droidwin.com/how-to-hide-su-file-and-magisk-file/">https://droidwin.com/how-to-hide-su-file-and-magisk-file/</a></li>
+<li><a href="https://stackoverflow.com/questions/18808705/android-root-detection-using-build-tags">https://stackoverflow.com/questions/18808705/android-root-detection-using-build-tags</a></li>
+<li><a href="https://developer.android.com/reference/android/content/pm/ApplicationInfo#flags">https://developer.android.com/reference/android/content/pm/ApplicationInfo#flags</a></li>
+<li><a href="https://frida.re/docs/android/">https://frida.re/docs/android/</a></li>
+<li><a href="https://frida.re/docs/javascript-api">https://frida.re/docs/javascript-api</a></li>
+</ul>
+<h2 id="i-first-analysis" id=i-first-analysis>
+  
+    <span class="me-2">I. First analysis</span>
+    <a href="#i-first-analysis" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h2><p>We get <a href="UnCrackable-Level1.apk">this APK file</a> :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ file UnCrackable-Level1.apk 
+</span></span><span style="display:flex;"><span>UnCrackable-Level1.apk: Android package <span style="color:#f92672">(</span>APK<span style="color:#f92672">)</span>, with AndroidManifest.xml, with APK Signing Block</span></span></code></pre></div>
+</div>
+<p>So there&rsquo;s obviously the <strong>AndroidManifest.xml</strong> file containing the app metadata. The <code>file</code> command also shows the presence of the <strong>APK Signing Block</strong>.</p>
+<blockquote>
+<p>[!NOTE] <strong>APK Signing Block</strong>
+An APK Signing Block is a dedicated section within an APK. It stores the <strong>app&rsquo;s cryptographic signatures and developer identity</strong>, ensuring the app is authentic, hasn&rsquo;t been tampered with, and safely installs on the Android operating system.</p>
+</blockquote>
+<p>We can install the APK file on our <strong>emulated rooted device</strong> :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ adb install UnCrackable-Level1.apk 
+</span></span><span style="display:flex;"><span>Performing Streamed Install
+</span></span><span style="display:flex;"><span>Success</span></span></code></pre></div>
+</div>
+<p>While launching the app, we see it detects right away the device is rooted.</p>
+<p><a href="/img/detected.png" class="popup img-link ">
+  <img src="/img/detected.png" alt="alt text">
+</a></p>
+<h2 id="ii-static-reverse-with-jadx" id=ii-static-reverse-with-jadx>
+  
+    <span class="me-2">II. Static reverse with JADX</span>
+    <a href="#ii-static-reverse-with-jadx" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h2><p>Let&rsquo;s inspect the source code in order to understand <strong>how the root detection is made</strong> so we&rsquo;ll be able to understand how to bypass it.</p>
+<p>By looking at the <code>onCreate</code> function (<em>the start of the app lifecycle</em>) we can see that <strong>four verifications</strong> are made before letting the user access the app.</p>
+<p><a href="/img/oncreate.png" class="popup img-link ">
+  <img src="/img/oncreate.png" alt="alt text">
+</a></p>
+<p>Now, we can look for the &ldquo;<code>c</code>&rdquo; class to see the <strong>anti-root</strong> protections. Here is the commented version :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> sg.vantagepoint.a;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> android.os.Build;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.File;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">c</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Searches in the PATH env variable directories for the &#34;su&#34; binary (meaning the device is rooted)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">a</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (String str : System.<span style="color:#a6e22e">getenv</span>(<span style="color:#e6db74">&#34;PATH&#34;</span>).<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// str being a directory</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// checks if &lt;directory&gt;/su file exists</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// if it does, returns true</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">new</span> File(str, <span style="color:#e6db74">&#34;su&#34;</span>).<span style="color:#a6e22e">exists</span>()) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Checks if the OS was signed with test-keys</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">b</span>() {
+</span></span><span style="display:flex;"><span>        String str <span style="color:#f92672">=</span> Build.<span style="color:#a6e22e">TAGS</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> str <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">&amp;&amp;</span> str.<span style="color:#a6e22e">contains</span>(<span style="color:#e6db74">&#34;test-keys&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Simply checks for the presence of any of the files declared in the String array</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">c</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (String str : <span style="color:#66d9ef">new</span> String<span style="color:#f92672">[]</span>{<span style="color:#e6db74">&#34;/system/app/Superuser.apk&#34;</span>, <span style="color:#e6db74">&#34;/system/xbin/daemonsu&#34;</span>, <span style="color:#e6db74">&#34;/system/etc/init.d/99SuperSUDaemon&#34;</span>, <span style="color:#e6db74">&#34;/system/bin/.ext/.su&#34;</span>, <span style="color:#e6db74">&#34;/system/etc/.has_su_daemon&#34;</span>, <span style="color:#e6db74">&#34;/system/etc/.installed_su_daemon&#34;</span>, <span style="color:#e6db74">&#34;/dev/com.koushikdutta.superuser.daemon/&#34;</span>}) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">new</span> File(str).<span style="color:#a6e22e">exists</span>()) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<h3 id="1-ca---protection-via-path-analysis" id=1-ca---protection-via-path-analysis>
+  
+    <span class="me-2">1. <code>c.a()</code> :  Protection via PATH analysis</span>
+    <a href="#1-ca---protection-via-path-analysis" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h3><p>Function code :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">a</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (String str : System.<span style="color:#a6e22e">getenv</span>(<span style="color:#e6db74">&#34;PATH&#34;</span>).<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;:&#34;</span>)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">new</span> File(str, <span style="color:#e6db74">&#34;su&#34;</span>).<span style="color:#a6e22e">exists</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>To bypass this, let&rsquo;s first look at our PATH on our android device :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ adb shell <span style="color:#e6db74">&#39;echo $PATH&#39;</span>
+</span></span><span style="display:flex;"><span>/sbin:/system/sbin:/product/bin:/apex/com.android.runtime/bin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin</span></span></code></pre></div>
+</div>
+<p>After running this command, we can see which directories of our device path contains the <code>su</code> binary :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ adb shell <span style="color:#e6db74">&#39;for d in $(echo $PATH | tr &#34;:&#34; &#34; &#34;); do ls $d 2&gt;/dev/null | grep &#34;^su$&#34; &gt;/dev/null &amp;&amp; echo $d; done&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>/system/bin
+</span></span><span style="display:flex;"><span>/system/xbin</span></span></code></pre></div>
+</div>
+<blockquote>
+<p>Here are two ways of bypassing this.</p>
+<ol>
+<li>The easiest way : <strong>Change the return value of this function</strong> with Frida&rsquo;s ability to hook functions, so it returns <code>false</code> no matter what.</li>
+<li>The hardest way : Install LSPosed Framework, Magisk. Then, flash the Shamiko module with Magisk&hellip;so the <code>/system/bin/su</code> and <code>/system/xbin/su</code> are hidden. It&rsquo;s heavy but works against real production apps. Here&rsquo;s a link to follow the process : <a href="https://droidwin.com/how-to-hide-su-file-and-magisk-file/">https://droidwin.com/how-to-hide-su-file-and-magisk-file/</a></li>
+</ol>
+</blockquote>
+<p>We&rsquo;ll go with the first way as the second one would require to setup the Android device with multiple apps/frameworks and this is overkill for such a crackme.</p>
+<h3 id="2-cb--protection-via-build-tags" id=2-cb--protection-via-build-tags>
+  
+    <span class="me-2">2. <code>c.b()</code> : Protection via Build Tags</span>
+    <a href="#2-cb--protection-via-build-tags" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h3><p>Function code :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">b</span>() {
+</span></span><span style="display:flex;"><span>    String str <span style="color:#f92672">=</span> Build.<span style="color:#a6e22e">TAGS</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> str <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">&amp;&amp;</span> str.<span style="color:#a6e22e">contains</span>(<span style="color:#e6db74">&#34;test-keys&#34;</span>);
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>We can see the verification made on <code>Build.TAGS</code></p>
+<p>The <a href="https://learn.microsoft.com/en-us/dotnet/api/android.os.build.tags?view=net-android-35.0">documentation</a> says the <code>android.os.Build.TAGS</code> is a <strong>string</strong> containing comma-separated tags describing the build, like &ldquo;<em>unsigned</em>,<em>debug</em>&rdquo;.</p>
+<p>There&rsquo;s a post on Stackoverflow asking what is this root detection doing :</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/18808705/android-root-detection-using-build-tags">https://stackoverflow.com/questions/18808705/android-root-detection-using-build-tags</a></li>
+</ul>
+<p>This method checks the <code>android.os.Build.TAGS</code> property to see if <strong>the operating system was signed with <code>test-keys</code></strong> (typically used in <a href="https://emteria.com/blog/aosp-rom">AOSP or custom ROMs</a>) instead of the official <code>release-keys</code> provided by device manufacturers.</p>
+<p>However this approach is really unreliable for two reasons :</p>
+<ol>
+<li><strong>False positives</strong>: If a user installs a custom OS like Graphene for privacy reasons, he&rsquo;d get blocked for no reason while being perfectly legitimate.</li>
+<li><strong>False negatives</strong>: Modern rooting solutions are &ldquo;systemless&rdquo;, so they don&rsquo;t modify the build tags. So a rooted device could still display <code>release-keys</code> and bypass this protection.</li>
+</ol>
+<p>As for <code>c.a()</code>, we&rsquo;ll just <strong>override this method</strong> for it to <strong>return false</strong>.</p>
+<h3 id="3-cc--protection-via-existing-files-checking" id=3-cc--protection-via-existing-files-checking>
+  
+    <span class="me-2">3. <code>c.c()</code> : Protection via existing files checking</span>
+    <a href="#3-cc--protection-via-existing-files-checking" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h3><p>This method checks if those files exist. If <strong>at least one of them</strong> does, it returns true.</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">c</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (String str : <span style="color:#66d9ef">new</span> String<span style="color:#f92672">[]</span>{<span style="color:#e6db74">&#34;/system/app/Superuser.apk&#34;</span>, <span style="color:#e6db74">&#34;/system/xbin/daemonsu&#34;</span>, <span style="color:#e6db74">&#34;/system/etc/init.d/99SuperSUDaemon&#34;</span>, <span style="color:#e6db74">&#34;/system/bin/.ext/.su&#34;</span>, <span style="color:#e6db74">&#34;/system/etc/.has_su_daemon&#34;</span>, <span style="color:#e6db74">&#34;/system/etc/.installed_su_daemon&#34;</span>, <span style="color:#e6db74">&#34;/dev/com.koushikdutta.superuser.daemon/&#34;</span>}) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">new</span> File(str).<span style="color:#a6e22e">exists</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>File utility :</p>
+<ul>
+<li><code>/system/app/Superuser.apk</code>: The GUI application installed on the device to manage root permissions and prompt the user when an app requests access.</li>
+<li><code>/system/xbin/daemonsu</code>: The background daemon process required by SuperSU to handle the actual root elevation requests.</li>
+<li><code>/system/etc/init.d/99SuperSUDaemon</code>: A boot script that ensures the SuperSU daemon starts automatically every time the Android device powers on.</li>
+<li><code>/system/bin/.ext/.su</code>: A hidden directory and binary location. Some older rooting methods placed the su binary here to hide it from basic checks that only scanned standard directories like <code>/system/bin/su</code>.</li>
+<li><code>/system/etc/.has_su_daemon</code> &amp; <code>/system/etc/.installed_su_daemon</code>: Hidden empty files acting as markers. The SuperSU installer creates them to flag that the system has been successfully rooted.</li>
+<li><code>/dev/com.koushikdutta.superuser.daemon/</code>: A specific Unix socket or device node created by <a href="https://www.clockworkmod.com/">Koushik Dutta&rsquo;s Superuser framework (ClockWorkMod)</a> to communicate with its background processes.</li>
+</ul>
+<p>As we can see, all those files are particular cases, so this verification isn&rsquo;t really useful/strong.</p>
+<blockquote>
+<p>[!TIP] The evolution of root hiding
+Like the <a href="#2-cb--protection-via-build-tags"><code>Build.TAGS</code> check</a>, looking for hardcoded paths is not effective against modern tools. <strong>Frameworks like <a href="https://github.com/topjohnwu/Magisk">Magisk</a> do not install their binaries or daemons in <code>/system</code> anymore</strong>, making them completely invisible to this type of static scanning.</p>
+</blockquote>
+<p>For a third time, we&rsquo;ll use Frida&rsquo;s ability to hook methods so <code>c.c()</code> returns false.</p>
+<h3 id="4-ba--anti-debug-protection-via-application-flags" id=4-ba--anti-debug-protection-via-application-flags>
+  
+    <span class="me-2">4. <code>b.a()</code> : Anti-debug protection via application flags</span>
+    <a href="#4-ba--anti-debug-protection-via-application-flags" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h3><p>We now can look for the &ldquo;<code>b</code>&rdquo; class as we know how to bypass the 3 anti-root protections we&rsquo;ve just seen.</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> sg.vantagepoint.a;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> android.content.Context;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/* JADX INFO: loaded from: classes.dex */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">b</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">a</span>(Context context) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (context.<span style="color:#a6e22e">getApplicationContext</span>().<span style="color:#a6e22e">getApplicationInfo</span>().<span style="color:#a6e22e">flags</span> <span style="color:#f92672">&amp;</span> 2) <span style="color:#f92672">!=</span> 0;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>What this method does is reading the 2<sup>nd</sup> least significant bit of the <code>flags</code> property and :</p>
+<ul>
+<li>Returns <em>true</em> if the <strong>flag is set</strong>.</li>
+<li>Returns <em>false</em> if the <strong>flag is not set</strong>.</li>
+</ul>
+<p>After reading the <a href="https://developer.android.com/reference/android/content/pm/ApplicationInfo#flags">Android documentation</a>, we can see the flag located at the 2<sup>nd</sup> least significant bit is the <code>FLAG_DEBUGGABLE</code> constant.</p>
+<p>If the bit is set, it means that the application would like to allow debugging of its code. <strong>It&rsquo;s not set by default as we didn&rsquo;t modify the app source code for it to be set</strong>, so it&rsquo;s not allowing debugging.</p>
+<p>Once again, we&rsquo;ll hook this function with Frida so it returns false no matter what.</p>
+<h2 id="iii-function-hooking-with-frida-js-api" id=iii-function-hooking-with-frida-js-api>
+  
+    <span class="me-2">III. Function hooking with Frida JS API</span>
+    <a href="#iii-function-hooking-with-frida-js-api" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h2><p>We can use TypeScript to write our JS script so we&rsquo;ll get autocompletion for Frida syntax.</p>
+<h3 id="setup" id=setup>
+  
+    <span class="me-2">Setup</span>
+    <a href="#setup" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h3><h4 id="scripting-requirements" id=scripting-requirements>
+  
+    <span class="me-2">Scripting requirements</span>
+    <a href="#scripting-requirements" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h4><p>In order to be able to code in TS, we have to setup like this :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ git clone https://github.com/oleavr/frida-agent-example.git /tmp/temp_frida
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ cp -r /tmp/temp_frida/. .
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ rm -rf temp_frida .git</span></span></code></pre></div>
+</div>
+<p>We now have to write our exploit script in <code>agent/index.ts</code>.</p>
+<blockquote>
+<p>[!TIP] TypeScript Setup
+We can keep a separate terminal open and run <code>npm run watch</code>. This will automatically compile our TypeScript code into JavaScript in real time after each modification.</p>
+<p>Also, we can add the following line at the very top of our <code>index.ts</code> file to enable IDE autocompletion and type definitions for the Frida and Java APIs:
+<code>/// &lt;reference types=&quot;frida-gum&quot; /&gt;</code></p>
+</blockquote>
+<h4 id="frida-server" id=frida-server>
+  
+    <span class="me-2">Frida server</span>
+    <a href="#frida-server" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h4><p>As our android device is rooted, we can simply install the <a href="https://github.com/frida/frida/releases/download/17.16.0/frida-server-17.16.0-android-x86.xz">frida-server</a> on the device.</p>
+<p>Once again, we just have to follow what the documentation says :</p>
+<ul>
+<li><a href="https://frida.re/docs/android/">https://frida.re/docs/android/</a></li>
+</ul>
+<p>So it should look like that :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ adb root <span style="color:#75715e"># incase</span>
+</span></span><span style="display:flex;"><span>adbd is already running as root
+</span></span><span style="display:flex;"><span>$ ls
+</span></span><span style="display:flex;"><span>- frida-server-17.16.0-android-x86
+</span></span><span style="display:flex;"><span>$ mv frida-server-17.16.0-android-x86 frida-server
+</span></span><span style="display:flex;"><span>$ adb push frida-server /data/local/tmp/
+</span></span><span style="display:flex;"><span>frida-server: <span style="color:#ae81ff">1</span> file pushed, <span style="color:#ae81ff">0</span> ...MB/s <span style="color:#f92672">(</span><span style="color:#ae81ff">53935444</span> bytes in 0.164s<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>$ adb shell <span style="color:#e6db74">&#34;chmod 755 /data/local/tmp/frida-server&#34;</span>
+</span></span><span style="display:flex;"><span>$ adb shell <span style="color:#e6db74">&#34;/data/local/tmp/frida-server &amp;&#34;</span></span></span></code></pre></div>
+</div>
+<h3 id="scripting-the-hooking" id=scripting-the-hooking>
+  
+    <span class="me-2">Scripting the hooking</span>
+    <a href="#scripting-the-hooking" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h3><p>Now the server is running, let&rsquo;s write our script.</p>
+<p>The documentation is easy to understand. To hook a function, we do :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> classWeWant <span style="color:#f92672">=</span> Java.<span style="color:#a6e22e">use</span>(<span style="color:#960050;background-color:#1e0010">&#39;</span>package.<span style="color:#a6e22e">classname</span><span style="color:#960050;background-color:#1e0010">&#39;</span>);
+</span></span><span style="display:flex;"><span>classWeWant.<span style="color:#a6e22e">methodName</span>.<span style="color:#a6e22e">implementation</span> <span style="color:#f92672">=</span> function () {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// whatever we want here</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>Let&rsquo;s see if the anti-root protection message changes with this script, as it hooks the 3 anti root protection functions :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="TypeScript"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#75715e">/// &lt;reference types=&#34;frida-gum&#34; /&gt;
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">Java</span> <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#34;frida-java-bridge&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">log</span> } <span style="color:#66d9ef">from</span> <span style="color:#e6db74">&#34;./logger.js&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Java</span>.<span style="color:#a6e22e">perform</span>(() <span style="color:#f92672">=&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">cClass</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Java</span>.<span style="color:#a6e22e">use</span>(<span style="color:#e6db74">&#39;sg.vantagepoint.a.c&#39;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cClass</span>.<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">implementation</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> () {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cClass</span>.<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">implementation</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> () {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">cClass</span>.<span style="color:#a6e22e">c</span>.<span style="color:#a6e22e">implementation</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span> () {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>})</span></span></code></pre></div>
+</div>
+<p>We can use the command below to make frida itself start the application while injecting our script into the Java runtime.</p>
+<ul>
+<li><code>-U</code> : Tells Frida to connect to the USB plugged device. Here, the &ldquo;usb plugged device&rdquo; is recognized through ADB.</li>
+<li><code>-f owasp.mstg.uncrackable1</code> : Tells frida to start the application itself. If we did not use this option, <strong>the anti-root detection would be effective even before our script is injected into the runtime</strong>.</li>
+<li><code>-l _agent.js</code> : We use the <code>agent/index.ts</code> to write our code that is compiled into the <code>_agent.js</code> file. So this is the final script containing our exploit.</li>
+</ul>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>$ frida -U -f owasp.mstg.uncrackable1 -l _agent.js
+</span></span><span style="display:flex;"><span>     ____
+</span></span><span style="display:flex;"><span>    / _  |   Frida 17.16.1 - A world-class dynamic instrumentation toolkit
+</span></span><span style="display:flex;"><span>   | <span style="color:#f92672">(</span>_| |
+</span></span><span style="display:flex;"><span>    &gt; _  |   Commands:
+</span></span><span style="display:flex;"><span>   /_/ |_|       help      -&gt; Displays the help system
+</span></span><span style="display:flex;"><span>   . . . .       object?   -&gt; Display information about <span style="color:#e6db74">&#39;object&#39;</span>
+</span></span><span style="display:flex;"><span>   . . . .       exit/quit -&gt; Exit
+</span></span><span style="display:flex;"><span>   . . . .
+</span></span><span style="display:flex;"><span>   . . . .   Prefer a GUI? Luma is the official Frida app, with a live REPL,
+</span></span><span style="display:flex;"><span>   . . . .   persistent sessions &amp; collaboration. https://luma.frida.re/
+</span></span><span style="display:flex;"><span>   . . . .
+</span></span><span style="display:flex;"><span>   . . . .   Connected to Pixel <span style="color:#ae81ff">3</span> <span style="color:#f92672">(</span>id<span style="color:#f92672">=</span>127.0.0.1:6555<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Spawned <span style="color:#e6db74">`</span>owasp.mstg.uncrackable1<span style="color:#e6db74">`</span>. Resuming main thread!                
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>Pixel 3::owasp.mstg.uncrackable1 <span style="color:#f92672">]</span>-&gt;</span></span></code></pre></div>
+</div>
+<p>Looking at our device, we can see <strong>the anti root warning disappeared</strong> and that we can now enter the string we want in the input field. Let&rsquo;s try a random string to see what message we now get.</p>
+<p><a href="/img/bypassed.png" class="popup img-link ">
+  <img src="/img/bypassed.png" alt="alt text">
+</a></p>
+<blockquote>
+<p>[!IMPORTANT]
+We bypassed the anti-root protections. The anti-debug protection (application flags) was not triggered as we did not modify the APK, so no need to add a hook for it into our exploitation script.</p>
+</blockquote>
+<h2 id="finding-the-secret" id=finding-the-secret>
+  
+    <span class="me-2">Finding the secret</span>
+    <a href="#finding-the-secret" class="anchor text-muted"><i class="fas fa-hashtag"></i></a>
+  
+</h2><p>Now that we can do whatever we want on the app as we bypassed the protections, let&rsquo;s find the string to validate this crackme.</p>
+<p>This function is called whenever the user clicks on the &ldquo;Verify&rdquo; button.</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">verify</span>(View view) {
+</span></span><span style="display:flex;"><span>    String str;
+</span></span><span style="display:flex;"><span>    String string <span style="color:#f92672">=</span> ((EditText) findViewById(R.<span style="color:#a6e22e">id</span>.<span style="color:#a6e22e">edit_text</span>)).<span style="color:#a6e22e">getText</span>().<span style="color:#a6e22e">toString</span>();
+</span></span><span style="display:flex;"><span>    AlertDialog alertDialogCreate <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AlertDialog.<span style="color:#a6e22e">Builder</span>(<span style="color:#66d9ef">this</span>).<span style="color:#a6e22e">create</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (a.<span style="color:#a6e22e">a</span>(string)) {
+</span></span><span style="display:flex;"><span>        alertDialogCreate.<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;Success!&#34;</span>);
+</span></span><span style="display:flex;"><span>        str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;This is the correct secret.&#34;</span>;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        alertDialogCreate.<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;Nope...&#34;</span>);
+</span></span><span style="display:flex;"><span>        str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;That&#39;s not it. Try again.&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    alertDialogCreate.<span style="color:#a6e22e">setMessage</span>(str);
+</span></span><span style="display:flex;"><span>    alertDialogCreate.<span style="color:#a6e22e">setButton</span>(<span style="color:#f92672">-</span>3, <span style="color:#e6db74">&#34;OK&#34;</span>, <span style="color:#66d9ef">new</span> DialogInterface.<span style="color:#a6e22e">OnClickListener</span>() { <span style="color:#75715e">// from class: sg.vantagepoint.uncrackable1.MainActivity.2</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@Override</span> <span style="color:#75715e">// android.content.DialogInterface.OnClickListener</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onClick</span>(DialogInterface dialogInterface, <span style="color:#66d9ef">int</span> i) {
+</span></span><span style="display:flex;"><span>            dialogInterface.<span style="color:#a6e22e">dismiss</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    alertDialogCreate.<span style="color:#a6e22e">show</span>();
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>This is the interesting part. It takes the user input - the &ldquo;<code>string</code>&rdquo; variable - and calls the <code>sg.vantagepoint.uncrackable1.a.a(String str)</code> function.</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (a.<span style="color:#a6e22e">a</span>(string)) {
+</span></span><span style="display:flex;"><span>    alertDialogCreate.<span style="color:#a6e22e">setTitle</span>(<span style="color:#e6db74">&#34;Success!&#34;</span>);
+</span></span><span style="display:flex;"><span>    str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;This is the correct secret.&#34;</span>;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>Going into the &ldquo;<code>a</code>&rdquo; class of the <code>sg.vantagepoint.uncrackable1</code> package, we find this code for the &ldquo;<code>a</code>&rdquo; method :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> sg.vantagepoint.uncrackable1;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> android.util.Base64;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> android.util.Log;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/* JADX INFO: loaded from: classes.dex */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">a</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">a</span>(String str) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> bArrA;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> bArr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            bArrA <span style="color:#f92672">=</span> sg.<span style="color:#a6e22e">vantagepoint</span>.<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">a</span>(b(<span style="color:#e6db74">&#34;8d127684cbc37c17616d806cf50473cc&#34;</span>), Base64.<span style="color:#a6e22e">decode</span>(<span style="color:#e6db74">&#34;5UJiFctbmgbDoLXmpL12mkno8HT4Lv8dlat8FxR2GOc=&#34;</span>, 0));
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>            Log.<span style="color:#a6e22e">d</span>(<span style="color:#e6db74">&#34;CodeCheck&#34;</span>, <span style="color:#e6db74">&#34;AES error:&#34;</span> <span style="color:#f92672">+</span> e.<span style="color:#a6e22e">getMessage</span>());
+</span></span><span style="display:flex;"><span>            bArrA <span style="color:#f92672">=</span> bArr;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> str.<span style="color:#a6e22e">equals</span>(<span style="color:#66d9ef">new</span> String(bArrA));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    ...
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>Instead of wasting time trying to understand the crypto operations, let&rsquo;s hook the <code>sg.vantagepoint.a.a.a</code> function so it directly prints the value it computes (the expected value for our input).</p>
+<p>The method looks like this :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="Java"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> sg.vantagepoint.a;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.security.InvalidKeyException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.security.NoSuchAlgorithmException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javax.crypto.Cipher;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javax.crypto.NoSuchPaddingException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javax.crypto.spec.SecretKeySpec;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/* JADX INFO: loaded from: classes.dex */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">a</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> <span style="color:#a6e22e">a</span>(<span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> bArr, <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> bArr2) <span style="color:#66d9ef">throws</span> NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+</span></span><span style="display:flex;"><span>        SecretKeySpec secretKeySpec <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> SecretKeySpec(bArr, <span style="color:#e6db74">&#34;AES/ECB/PKCS7Padding&#34;</span>);
+</span></span><span style="display:flex;"><span>        Cipher cipher <span style="color:#f92672">=</span> Cipher.<span style="color:#a6e22e">getInstance</span>(<span style="color:#e6db74">&#34;AES&#34;</span>);
+</span></span><span style="display:flex;"><span>        cipher.<span style="color:#a6e22e">init</span>(2, secretKeySpec);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> cipher.<span style="color:#a6e22e">doFinal</span>(bArr2);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>We can append this at the end of our <code>agent/index.ts</code> :</p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text="TypeScript"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-ts" data-lang="ts"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">aClass</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Java</span>.<span style="color:#a6e22e">use</span>(<span style="color:#e6db74">&#39;sg.vantagepoint.a.a&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">aClass</span>.<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">implementation</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">arg1</span>: <span style="color:#66d9ef">any</span>, <span style="color:#a6e22e">arg2</span>: <span style="color:#66d9ef">any</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// By calling this.a() aka the method we&#39;re currently hooking we can execute the original code before the one we define gets executed
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">secret</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">a</span>(<span style="color:#a6e22e">arg1</span>, <span style="color:#a6e22e">arg2</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// so we get a byte array 
+</span></span></span><span style="display:flex;"><span>    <span style="color:#75715e">// let&#39;s convert it to a string
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Secret size : &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">secret</span>.<span style="color:#a6e22e">length</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Secret raw : &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">secret</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">secret</span>.<span style="color:#a6e22e">length</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">result</span> <span style="color:#f92672">+=</span> String.<span style="color:#a6e22e">fromCharCode</span>(parseInt(<span style="color:#a6e22e">secret</span>[<span style="color:#a6e22e">i</span>], <span style="color:#ae81ff">10</span>));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Secret (array bytes -&gt; string) : &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">result</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">secret</span>;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+</div>
+<p>By relaunching the script injection with frida and submitting a random input, we indeed get the computed secret !</p>
+<p><a href="/img/flag.png" class="popup img-link ">
+  <img src="/img/flag.png" alt="alt text">
+</a></p>
+<div class="code-block">
+  <div class="code-header"> <span data-label-text=""><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div>
+  
+  <pre tabindex="0"><code>I want to believe
+```⏎     </code></pre>
+</div>
+
+    </div>
+
+    <div class="post-tail-wrapper text-muted">
+      
+      
+        <div class="post-meta mb-3">
+          <i class="far fa-folder-open fa-fw me-1"></i>
+          
+          
+            
+              
+              <a href="/categories/reverse-engineering/">Reverse Engineering</a>
+            
+            ,
+          
+            
+              
+              
+              <a href="/categories/reverse-engineering/android/">Android</a>
+            
+            
+          
+        </div>
+      
+
+      
+      
+        <div class="post-tags">
+          <i class="fa fa-tags fa-fw me-1"></i>
+          
+            <a
+              href="/tags/frida/"
+              class="post-tag no-text-decoration"
+            >Frida</a>
+          
+            <a
+              href="/tags/hooking/"
+              class="post-tag no-text-decoration"
+            >Hooking</a>
+          
+            <a
+              href="/tags/crackme/"
+              class="post-tag no-text-decoration"
+            >Crackme</a>
+          
+        </div>
+      
+
+      <div class="post-tail-bottom d-flex justify-content-between align-items-center mt-5 pb-2">
+        <div class="license-wrapper">
+          
+            
+            This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> by the author.
+          
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+          </main>
+
+          
+          <aside aria-label="Panel" id="panel-wrapper" class="col-xl-3 ps-2 text-muted">
+            <div class="access">
+              
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+  <section id="access-lastmod">
+    <h2 class="panel-heading">Recently Updated</h2>
+    <ul class="content list-unstyled ps-0 pb-1 ms-1 mt-2">
+      
+        
+        
+        
+        <li class="text-truncate lh-lg">
+          <a href="/post/uncrackable-1/">OWASP MAS - I</a>
+        </li>
+      
+    </ul>
+  </section>
+  
+
+              
+
+
+
+
+
+  
+
+  
+
+  
+
+
+
+
+
+
+
+
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+
+
+  <section>
+    <h2 class="panel-heading">Trending Tags</h2>
+    <div class="d-flex flex-wrap mt-3 mb-1 me-3">
+      
+        
+        <a class="post-tag btn btn-outline-primary" href="http://localhost:1313/tags/crackme/">crackme</a>
+      
+        
+        <a class="post-tag btn btn-outline-primary" href="http://localhost:1313/tags/frida/">frida</a>
+      
+        
+        <a class="post-tag btn btn-outline-primary" href="http://localhost:1313/tags/hooking/">hooking</a>
+      
+    </div>
+  </section>
+
+            </div>
+            
+  
+
+
+
+  
+
+
+
+
+
+
+          </aside>
+        </div>
+
+        <div class="row">
+          
+          <div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 px-md-4">
+            
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+
+  
+  
+
+  
+  
+
+
+
+
+
+
+  
+    
+
+
+
+
+
+
+
+
+
+
+  <nav class="post-navigation d-flex justify-content-between" aria-label="Post Navigation">
+  
+  
+
+  
+    <div class="btn btn-outline-primary disabled" aria-label="Older">
+      <p>-</p>
+    </div>
+  
+
+  
+    <div class="btn btn-outline-primary disabled" aria-label="Newer">
+      <p>-</p>
+    </div>
+  
+</nav>
+  
+
+
+
+            
+<footer
+  aria-label="Site Info"
+  class="
+    d-flex flex-column justify-content-center text-muted
+    flex-lg-row justify-content-lg-between align-items-lg-center pb-lg-3
+  "
+>
+  <p>
+    ©
+    <time>2026</time>
+
+    
+      
+    
+
+    <span
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+      title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author."
+    >Some rights reserved.</span>
+  </p>
+
+  <p>Using the <a
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="v1.0.2"
+        href="https://github.com/geekifan/hugo-theme-chirpy"
+        target="_blank"
+        rel="noopener"
+      >Chirpy</a> theme for <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a>.
+  </p>
+</footer>
+          </div>
+        </div>
+        <div id="search-result-wrapper" class="d-flex justify-content-center d-none">
+  <div class="col-11 content">
+    <div id="search-hints">
+      
+
+
+
+
+
+  
+
+  
+
+  
+
+
+
+
+
+
+
+
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+
+
+  <section>
+    <h2 class="panel-heading">Trending Tags</h2>
+    <div class="d-flex flex-wrap mt-3 mb-1 me-3">
+      
+        
+        <a class="post-tag btn btn-outline-primary" href="http://localhost:1313/tags/crackme/">crackme</a>
+      
+        
+        <a class="post-tag btn btn-outline-primary" href="http://localhost:1313/tags/frida/">frida</a>
+      
+        
+        <a class="post-tag btn btn-outline-primary" href="http://localhost:1313/tags/hooking/">hooking</a>
+      
+    </div>
+  </section>
+
+    </div>
+    <div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_CONFIG = {
+    search: {
+      minChars: 1,              
+      maxResults: 5,            
+      fields: {                 
+        title: true,
+        description: true,
+        section: true,
+        contents: true
+      },
+      
+      strictMode: true          
+    }
+  };
+
+  class FastSearch {
+    constructor({
+      searchInput, resultsContainer, json,
+      searchResultTemplate = null,
+      noResultsText = null,
+    }) {
+      this.searchInput = searchInput;
+      this.resultsContainer = resultsContainer;
+      this.json = json;
+      this.searchResultTemplate = searchResultTemplate;
+      this.noResultsText = noResultsText;
+      
+      this.init();
+    }
+
+    init() {
+      this.loadSearchIndex();
+      this.searchInput.addEventListener('input', (event) => {
+        if (!this.searchIndex) {
+          this.resultsContainer.innerHTML = '<li class="search-message">Loading search index...</li>';
+          return;
+        }
+        this.performSearch(this.searchInput.value);
+      });
+    }
+
+    
+    async loadSearchIndex() {
+      try {
+        const response = await fetch(this.json);
+        if (!response.ok) throw new Error('Failed to load search index');
+        const data = await response.json();
+        
+        this.searchIndex = data.map(item => ({
+          ...item,
+          
+          searchableTitle: item.title?.toLowerCase() || '',
+          searchableDesc: item.desc?.toLowerCase() || '',
+          searchableSection: item.section?.toLowerCase() || '',
+          searchableContents: item.contents?.toLowerCase() || ''
+        }));
+        } catch (error) {
+          console.error('Error loading search index:', error);
+        this.resultsContainer.innerHTML = '<li class="search-message">Error loading search index...</li>';
+      }
+    }
+
+    escapeHtml(unsafe) {
+      if (!unsafe) return '';
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+    
+    
+    containsTerm(text, term) {
+      if (!text || !term) return false;
+      return text.includes(term);
+    }
+
+    performSearch(query) {
+      
+      query = query.toLowerCase().trim();
+      
+      
+      if (!query || !this.searchIndex || query.length < DEFAULT_CONFIG.search.minChars) {
+        this.resultsContainer.innerHTML = '';
+        return;
+      }
+
+      
+      const searchTerms = [
+        query, 
+        ...query.split(/\s+/).filter(term => term.length > 0) 
+      ];
+      
+      
+      const uniqueTerms = [...new Set(searchTerms)];
+      
+      
+      const requireFullQueryMatch = DEFAULT_CONFIG.search.strictMode;
+      
+      
+      const results = this.searchIndex
+        .map(item => {
+          
+          const fullQueryMatched = this.checkFieldsForMatch(item, uniqueTerms[0]);
+          
+          
+          if (requireFullQueryMatch && !fullQueryMatched) {
+            return { item, score: 0, matched: false };
+          }
+          
+          
+          let score = 0;
+          let matchedTermsCount = 0;
+          let matchedInTitle = false;
+          
+          
+          uniqueTerms.forEach((term, index) => {
+            
+            const isFullQuery = index === 0;
+            const matched = this.checkFieldsForMatch(item, term);
+            
+            if (matched) {
+              matchedTermsCount++;
+              
+              
+              if (matched.inTitle) {
+                score += isFullQuery ? 10 : 5;
+                matchedInTitle = true;
+              }
+              if (matched.inDesc) {
+                score += isFullQuery ? 8 : 4;
+              }
+              if (matched.inSection) {
+                score += isFullQuery ? 6 : 3;
+              }
+              if (matched.inContents) {
+                score += isFullQuery ? 4 : 2;
+              }
+            }
+          });
+          
+          
+          const matchRatio = matchedTermsCount / uniqueTerms.length;
+          
+          
+          const finalScore = score * matchRatio * (matchedInTitle ? 1.5 : 1);
+          
+          return {
+            item,
+            score: finalScore,
+            matched: fullQueryMatched 
+          };
+        })
+        .filter(result => result.matched)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, DEFAULT_CONFIG.search.maxResults)
+        .map(result => result.item);
+
+      
+      if (results.length === 0) {
+        this.resultsContainer.innerHTML = '<p class="mt-5">Oops! No results found.</p>';
+        return;
+      }
+
+      const searchItems = results.map((item) => {
+        let categories = '';
+        let tags = '';
+        if (item.categories) {
+          categories = item.categories.join(', ');
+          categories = `<div class="me-sm-4"><i class="far fa-folder fa-fw"></i>${categories}</div>`;
+        }
+        if (item.tags) {
+          tags = item.tags.join(', ');
+          tags = `<div><i class="fa fa-tag fa-fw"></i>${tags}</div>`
+        }
+        return `
+        <article class="px-1 px-sm-2 px-lg-4 px-xl-0">
+          <header>
+            <h2><a href="${this.escapeHtml(item.permalink)}">${this.escapeHtml(item.title)}</a></h2>
+            <div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1">
+              ${categories}
+              ${tags}
+            </div>
+          </header>
+          <p>${this.escapeHtml(item.contents)}</p>
+        </article>
+      `;
+      }).join('');
+      
+      this.resultsContainer.innerHTML = searchItems;
+    }
+    
+    
+    checkFieldsForMatch(item, term) {
+      const matches = {
+        inTitle: false,
+        inDesc: false,
+        inSection: false,
+        inContents: false
+      };
+      
+      
+      if (DEFAULT_CONFIG.search.fields.title && this.containsTerm(item.searchableTitle, term)) {
+        matches.inTitle = true;
+      }
+      
+      if (DEFAULT_CONFIG.search.fields.description && this.containsTerm(item.searchableDesc, term)) {
+        matches.inDesc = true;
+      }
+      
+      if (DEFAULT_CONFIG.search.fields.section && this.containsTerm(item.searchableSection, term)) {
+        matches.inSection = true;
+      }
+      
+      if (DEFAULT_CONFIG.search.fields.contents && this.containsTerm(item.searchableContents, term)) {
+        matches.inContents = true;
+      }
+      
+      
+      if (matches.inTitle || matches.inDesc || matches.inSection || matches.inContents) {
+        return matches;
+      }
+      
+      
+      return false;
+    }
+  }
+
+  const search = new FastSearch({
+    searchInput: document.getElementById('search-input'),
+    resultsContainer: document.getElementById('search-results'),
+    json: `\/index.json`
+  });
+
+</script>
+      </div>
+
+      <aside aria-label="Scroll to Top">
+        <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow">
+          <i class="fas fa-angle-up"></i>
+        </button>
+      </aside>
+    </div>
+
+    <div id="mask" class="d-none position-fixed w-100 h-100 z-1"></div>
+  </body>
+</html>

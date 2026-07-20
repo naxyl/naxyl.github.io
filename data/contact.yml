@@ -1,0 +1,11 @@
+- type: github
+  icon: "fab fa-github"
+  url: "https://github.com/naxyl"
+
+- type: email
+  icon: "fas fa-envelope"
+  url: "mailto:contact@naxyl.re"
+
+- type: rss
+  icon: "fas fa-rss"
+  url: "/index.xml"

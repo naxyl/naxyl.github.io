@@ -1,0 +1,95 @@
+<!-- The Side Bar -->
+<aside aria-label="Sidebar" id="sidebar" class="d-flex flex-column align-items-end">
+  <header class="profile-wrapper">
+    <a href="{{ .Site.Home.RelPermalink }}" id="avatar" class="rounded-circle">
+      {{- if .Site.Params.avatar -}}
+        {{- $avatar := resources.Get .Site.Params.avatar -}}
+        {{- if $avatar -}}
+          <img src="{{ $avatar.RelPermalink }}" width="112" height="112" alt="avatar" onerror="this.style.display='none'">
+        {{- else -}}
+          <img src="{{ .Site.Params.avatar | absURL }}" width="112" height="112" alt="avatar" onerror="this.style.display='none'">
+        {{- end -}}
+      {{- end -}}
+    </a>
+
+    <a class="site-title d-block" href="{{ .Site.Home.RelPermalink }}">{{ .Site.Title }}</a>
+    {{ if .Site.Params.tagline }}
+      <p class="site-subtitle fst-italic mb-0">{{ .Site.Params.tagline }}</p>
+    {{ end }}
+  </header>
+  <!-- .profile-wrapper -->
+
+  <nav class="flex-column flex-grow-1 w-100 ps-0">
+    <ul class="nav">
+      {{ range .Site.Menus.main }}
+        {{ $active := false }}
+        {{ if eq (.URL) $.RelPermalink }}
+          {{ $active = true }}
+        {{ end }}
+        <li class="nav-item{{ if $active }} active{{ end }}">
+          <a href="{{ .URL }}" class="nav-link">
+            <i class="fa-fw fas {{ .Pre }}"></i>
+            <span>{{ .Name | upper }}</span>
+          </a>
+        </li>
+        <!-- .nav-item -->
+      {{ end }}
+
+      {{ if hugo.IsMultilingual }}
+        <li class="nav-item mt-4">
+          <a class="nav-link no-hover">
+            <i class="fa-fw fas fa-language"></i>
+            {{ partial "language-selector.html" . }}
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+  </nav>
+
+  <div class="sidebar-bottom d-flex flex-wrap align-items-center w-100">
+    {{ if not .Site.Params.themeMode }}
+      <button type="button" class="btn btn-link nav-link" aria-label="Switch Mode" id="mode-toggle">
+        <i class="fas fa-adjust"></i>
+      </button>
+
+      {{ if .Site.Params.social.links }}
+        <span class="icon-border"></span>
+      {{ end }}
+    {{ end }}
+
+    {{ range .Site.Params.social.links }}
+      {{ $url := "" }}
+      {{ $rel := "" }}
+
+      {{ if eq .type "github" }}
+        {{ $url = printf "https://github.com/%s" .id }}
+      {{ else if eq .type "twitter" }}
+        {{ $url = printf "https://twitter.com/%s" .id }}
+      {{ else if eq .type "email" }}
+        {{ $url = printf "mailto:%s" .id }}
+      {{ else if eq .type "rss" }}
+        {{ $url = "index.xml" | absLangURL }}
+      {{ else if eq .type "custom" }}
+        {{ $url = printf "%s" .id }}
+      {{ else }}
+        {{ $url = .url }}
+      {{ end }}
+
+      {{ if $url }}
+        <a
+          href="{{ $url }}"
+          aria-label="{{ .type }}"
+          {{ if not .noblank }}target="_blank" rel="noopener noreferrer"{{ end }}
+          {{ if eq .type "mastodon" }}rel="me"{{ end }}
+        >
+          <i class="{{ .icon }}"></i>
+        </a>
+      {{ end }}
+    {{ end }}
+      <a href="https://www.root-me.org/_ethereal" target="_blank" rel="noopener noreferrer" aria-label="Root-Me">
+      <img src="/img/logo_rm.png" alt="Root-Me" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; transform: translateY(-1px);">
+    </a>
+  </div>
+  <!-- .sidebar-bottom -->
+</aside>
+<!-- #sidebar -->
