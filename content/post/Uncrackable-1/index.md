@@ -39,8 +39,10 @@ UnCrackable-Level1.apk: Android package (APK), with AndroidManifest.xml, with AP
 
 So there's obviously the **AndroidManifest.xml** file containing the app metadata. The `file` command also shows the presence of the **APK Signing Block**. 
 
-> [!NOTE] **APK Signing Block** 
+> **APK Signing Block** 
+>
 > An APK Signing Block is a dedicated section within an APK. It stores the **app's cryptographic signatures and developer identity**, ensuring the app is authentic, hasn't been tampered with, and safely installs on the Android operating system.
+{.prompt-info}
 
 We can install the APK file on our **emulated rooted device** : 
 ```sh
@@ -186,8 +188,10 @@ File utility :
 As we can see, all those files are particular cases, so this verification isn't really useful/strong. 
 
 
->[!TIP] The evolution of root hiding
+> **The evolution of root hiding**
+> 
 > Like the [`Build.TAGS` check](#2-cb--protection-via-build-tags), looking for hardcoded paths is not effective against modern tools. **Frameworks like [Magisk](https://github.com/topjohnwu/Magisk) do not install their binaries or daemons in `/system` anymore**, making them completely invisible to this type of static scanning.
+{.prompt-info}
 
 For a third time, we'll use Frida's ability to hook methods so `c.c()` returns false. 
 
@@ -236,11 +240,14 @@ $ rm -rf temp_frida .git
 
 We now have to write our exploit script in `agent/index.ts`. 
 
-> [!TIP] TypeScript Setup
+> **TypeScript Setup**
+> 
 > We can keep a separate terminal open and run `npm run watch`. This will automatically compile our TypeScript code into JavaScript in real time after each modification.
 > 
 > Also, we can add the following line at the very top of our `index.ts` file to enable IDE autocompletion and type definitions for the Frida and Java APIs:
 > `/// <reference types="frida-gum" />`
+{.prompt-tip}
+
 
 #### Frida server
 As our android device is rooted, we can simply install the [frida-server](https://github.com/frida/frida/releases/download/17.16.0/frida-server-17.16.0-android-x86.xz) on the device. 
@@ -321,8 +328,10 @@ Looking at our device, we can see **the anti root warning disappeared** and that
 
 ![alt text](img/bypassed.png)
 
-> [!IMPORTANT]
+> **Anti-debug function hooking**
+> 
 > We bypassed the anti-root protections. The anti-debug protection (application flags) was not triggered as we did not modify the APK, so no need to add a hook for it into our exploitation script. 
+{.prompt-tip}
 
 ## Finding the secret
 
