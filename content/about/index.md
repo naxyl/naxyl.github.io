@@ -9,7 +9,7 @@ title: "About"
 Hi, I'm **naxyl**. 
 I'm a cybersecurity engineering student and a CTF player. I spend most of my time specializing in reverse engineering, analyzing mobile applications, and tearing down binaries.
 
-Fuck AI agents in CTFs btw :)
+Fuck AI sloppers in CTFs btw :)
 
 ## Links
 
