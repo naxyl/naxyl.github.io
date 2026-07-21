@@ -4,6 +4,7 @@ date: '2026-07-20T10:35:08+02:00'
 draft: false
 categories: [Reverse Engineering, Android]
 tags: [Frida, Hooking, Crackme]
+description: 'Solving the OWASP Uncrackable L1. Covers static analysis with JADX, bypassing anti-root detections, and Frida scripting for function hooking.'
 image:
   path: img/owasp_mas.jpg
   hide: true
