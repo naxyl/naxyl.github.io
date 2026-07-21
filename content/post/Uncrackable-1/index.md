@@ -195,7 +195,7 @@ As we can see, all those files are particular cases, so this verification isn't 
 
 For a third time, we'll use Frida's ability to hook methods so `c.c()` returns false. 
 
-### 4. `b.a()` : Anti-debug protection via application flags
+### 4. `b.a(Context context)` : Anti-debug protection via application flags
 We now can look for the "`b`" class as we know how to bypass the 3 anti-root protections we've just seen. 
 
 ```java
@@ -267,11 +267,11 @@ frida-server: 1 file pushed, 0 ...MB/s (53935444 bytes in 0.164s)
 $ adb shell "chmod 755 /data/local/tmp/frida-server"
 $ adb shell "/data/local/tmp/frida-server &"
 ```
-### Scripting the hooking
+### Scripting the hooks
 
 Now the server is running, let's write our script. 
 
-The documentation is easy to understand. To hook a function, we do : 
+The [Frida documentation](https://frida.re/docs/functions/) is easy to understand. To hook a function, we do : 
 ```java
 const classWeWant = Java.use('package.classname');
 classWeWant.methodName.implementation = function () {
