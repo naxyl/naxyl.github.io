@@ -235,6 +235,8 @@ $ git clone https://github.com/oleavr/frida-agent-example.git /tmp/temp_frida
 $ cp -r /tmp/temp_frida/. .
 
 $ rm -rf temp_frida .git
+
+$ npm install
 ```
 
 
