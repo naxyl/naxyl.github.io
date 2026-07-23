@@ -40,7 +40,7 @@ UnCrackable-Level2.apk: Android package (APK), with AndroidManifest.xml, with AP
 ```
 
 Let's install the APK file on our **emulated root device** : 
-```
+```sh
 $ adb install UnCrackable-Level2.apk 
 Performing Streamed Install
 Success
