@@ -180,7 +180,7 @@ Since all these protections were implemented on the Java side rather than in the
 
 
 ### *CodeCheck* and native library
-Moving down to the end of `onCreate()`, we notice that a `CodeCheck` object is instantiated and stored in the m attribute
+Moving down to the end of `onCreate()`, we notice that a `CodeCheck` object is instantiated and stored in the `m` attribute
 ```java
 @Override
 protected void onCreate(Bundle bundle) {
