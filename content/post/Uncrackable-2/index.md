@@ -70,6 +70,7 @@ We could still ask ourselves a question : *How does a high-level language like J
 > The JNI enables Java code to call and be called by **native code**, **native applications** (programs specific to a hardware and OS) and **libraries** written in other languages such as C, C++ or even assembly.  
 >
 > We can see this as the "*bridge*" between the ART (Java VM) and native code (directly interacting with real memory and processor). 
+{.prompt-info}
 
 
 
@@ -137,7 +138,7 @@ public void a(String str) {
 
 > **Hooking the exit handler**
 >
->We could easily bypass these just like the first crackme, but there's an even **faster way**! Instead of *individually* hooking `b.a()`, `b.b()`, `b.c()` and `a.a(getApplicationContext())`, we can directly hook the `MainActivity.a(String str)` so it does not force the user to exit the app anymore. 
+>We could easily bypass these just like the first crackme, but there's an even **faster way**! Instead of *individually* hooking `b.a()`, `b.b()`, `b.c()` and `a.a(getApplicationContext())`, we can directly hook the `MainActivity.a(String str)` so it does not force the user to exit the app anymore.
 {.prompt-tip}
 
 I already explained in the first writeup how to use Frida to *hook* functions, so here is the hooking code for the `MainActivity.a(String str)` function : 
@@ -166,7 +167,7 @@ Java.perform(() => {
 >
 > However, because `a()` was originally declared as a `private` method, the inner class (`AsyncTask`) technically shouldn't have access to it at the bytecode level. To fix this, the Java compiler silently generates a hidden **synthetic bridge method** (taking the `MainActivity` instance as its first argument) to allow the connection.
 >
-> So while JADX is smart enough to hide this trick for the code to stay readable, **Frida hooks directly into the Dalvik VM memory and sees everything**. Therefore, we must explicitly use `.overload('java.lang.String')` to tell Frida exactly which one of the two methods we want to redefine ! 
+> So while JADX is smart enough to hide this trick for the code to stay readable, **Frida hooks directly into the Dalvik VM memory and sees everything**. Therefore, we must explicitly use `.overload('java.lang.String')` to tell Frida exactly which one of the two methods we want to redefine !
 {.prompt-info}
 
 Let's try to inject this script and see if it bypasses these protections.
