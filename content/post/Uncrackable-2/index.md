@@ -239,8 +239,8 @@ While looking for the library in `Resources/lib` in JADX, four versions of the l
 
 > **Choosing the library architecture**
 > 
-> In order to choose the correct library to reverse we must select **the one that matches the architecture** of the device we are running the APK on. Since we're running the app on an `x86` emulator, we should extract and analyze the `x86` version of `libfoo.so`. 
-.{prompt-tip}
+> In order to choose the correct library to reverse we must select **the one that matches the architecture** of the device we are running the APK on. Since we're running the app on an `x86` emulator, we should extract and analyze the `x86` version of `libfoo.so`.
+{.prompt-tip}
 
 We can grab the library of the architecture we want with this command : 
 ```sh
