@@ -377,7 +377,7 @@ strncpy(&DAT_0001601c,__src,0x18);
 DAT_00016038 = DAT_00016038 + 1;
 ```
 
-### `FUN_00013250`: Anti-debug protection... or not 
+### 4. `FUN_00013250`: Anti-debug protection... or not 
 Now that we understand the `init(xorkey)` code, we need to understand the "protection" it uses before copying the xorkey in memory. The code looks a bit confusing at first: 
 
 ![alt text](img/fakeanti.png)  
