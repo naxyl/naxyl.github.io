@@ -1051,6 +1051,10 @@ You can find the final exploit script [here](./index.ts). Let's run it, and comp
   <source src="img/vidflag.mp4" type="video/mp4">
 </video>
 
+Flag : 
+```sh
+make owasp great again
+```
 
 
 ## VIII. Conclusion
