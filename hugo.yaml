@@ -8,6 +8,7 @@ module:
     - path: github.com/geekifan/hugo-theme-chirpy
 
 params:
+  toc: true
   mainSections: ["post"]
   theme:
     mode: dark
@@ -49,6 +50,9 @@ menu:
       pre: fa-info-circle
 
 markup:
+  tableOfContents:
+    startLevel: 2
+    endLevel: 4
   goldmark:
     parser:
       attribute:
@@ -56,6 +60,6 @@ markup:
     renderer:
       unsafe: true
   highlight:
-    noClasses: false       
-    lineNos: true           
+    noClasses: false
+    lineNos: true
     lineNumbersInTable: true
